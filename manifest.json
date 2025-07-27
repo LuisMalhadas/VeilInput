@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Veil Input",
+  "version": "0.0.1",
+  "description": "Replaces personal data with placeholders and restores it back using Gemini Nano.",
+  "permissions": ["scripting", "activeTab"],
+  "host_permissions": ["https://chatgpt.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://chatgpt.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "action": {
+    "default_title": "Privacy Mode"
+  },
+  "icons": {
+    "16": "./logo/VeilInput_Icon_16.png",
+    "48": "./logo/VeilInput_Icon_48.png",
+    "128": "./logo/VeilInput_Icon_128.png"
+  }
+}
