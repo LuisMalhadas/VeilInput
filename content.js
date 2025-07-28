@@ -1,35 +1,44 @@
+
+async function maskInput(event) {
+  const button = document.querySelector(".composer-submit-btn");
+  if (isProgrammaticClick) {
+    // Reset the flag and ignore this event to prevent loop
+    isProgrammaticClick = false;
+    return;
+  }
+  event.preventDefault();
+  event.stopImmediatePropagation();
+
+  const editable = document.querySelector(".ProseMirror");
+  if (!editable) return;
+  const originalText = editable.innerText;
+  let anonymized = await anonymizeText(originalText);
+  // Sometimes it fails to anonymize, so we retry until we get a different result
+  while (anonymized === originalText) {
+    anonymized = await anonymizeText(originalText);
+  }
+  editable.innerHTML = '';
+  editable.appendChild(document.createTextNode(anonymized));
+  editable.dispatchEvent(new InputEvent("input", { bubbles: true }));
+
+  isProgrammaticClick = true;
+  setTimeout(() => {
+    button.click();  // Programmatic click - will be ignored next time
+  }, 50);
+}
+
 let isProgrammaticClick = false;
 function setupListener() {
   document.body.addEventListener("click", async (event) => {
-    if (isProgrammaticClick) {
-      // Reset the flag and ignore this event to prevent loop
-      isProgrammaticClick = false;
-      return;
-    }
-
     const button = event.target.closest && event.target.closest(".composer-submit-btn");
-    if (!button) return;
-
-    event.preventDefault();
-    event.stopImmediatePropagation();
-
-    const editable = document.querySelector(".ProseMirror");
-    if (!editable) return;
-
-    const originalText = editable.innerText;
-    let anonymized = await anonymizeText(originalText);
-
-    while (anonymized === originalText) {
-      anonymized = await anonymizeText(originalText);
+    if (button) {
+      await maskInput(event);
     }
-    editable.innerHTML = '';
-    editable.appendChild(document.createTextNode(anonymized));
-    editable.dispatchEvent(new InputEvent("input", { bubbles: true }));
-
-    isProgrammaticClick = true;
-    setTimeout(() => {
-      button.click();  // Programmatic click - will be ignored next time
-    }, 50);
+  }, { capture: true, passive: false });
+  document.body.addEventListener("keydown", async (event) => {
+    if (event.key === "Enter") {
+      await maskInput(event);
+    }
   }, { capture: true, passive: false });
 }
 setupListener();
@@ -51,12 +60,11 @@ async function anonymizeText(text) {
                 Example sentence 2: My phone number is +1234567890,
                 Will be transformed to: My phone number is {{PHONE}}.
                 
-                Do not add any other text.`,
+                Do not add any other text. Go!`,
                 }],
             });
         }
         const replacedText = await session.prompt(text);
-
         console.log('Replaced text:', replacedText);
         return replacedText;
     } catch (e) {

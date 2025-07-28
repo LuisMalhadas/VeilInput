@@ -23,9 +23,8 @@ Veil Input is a highly experimental Chrome extension that automatically anonymiz
 
 - No option to review or confirm replaced text before sending.
 - Replacement is nondeterministic; the extent of anonymization varies each time.
-- Only triggers when clicking the button; pressing Enter does **not** activate anonymization.
 - Designed as an experimental proof of concept; may break with future ChatGPT updates.
-- Not officially affiliated with or supported by OpenAI or ChatGPT.
+- Not officially affiliated with or supported by OpenAI or ChatGPT or any relation with them.
 
 ---
 
